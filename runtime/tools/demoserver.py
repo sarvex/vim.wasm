@@ -60,10 +60,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
             # Send a response if the sequence number is positive.
             # Negative numbers are used for "eval" responses.
             if decoded[0] >= 0:
-                if decoded[1] == 'hello!':
-                    response = "got it"
-                else:
-                    response = "what?"
+                response = "got it" if decoded[1] == 'hello!' else "what?"
                 encoded = json.dumps([decoded[0], response])
                 print("sending {0}".format(encoded))
                 self.request.sendall(encoded.encode('utf-8'))

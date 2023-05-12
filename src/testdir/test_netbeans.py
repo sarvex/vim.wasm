@@ -44,28 +44,26 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
             response = ''
             if received.find('XREADME.txt') > 0:
                 name = received.split('"')[1]
-                response = '5:putBufferNumber!33 "' + name + '"\n'
+                response = f'5:putBufferNumber!33 "{name}' + '"\n'
                 response += '5:setDot!1 3/19\n'
             elif received.find('disconnect') > 0:
                 # we're done
                 self.server.shutdown()
                 return
 
-            if len(response) > 0:
+            if response != "":
                 self.request.sendall(response.encode('utf-8'))
                 # Write the respoinse into the file, so that the test can knows
                 # the command was sent.
                 with open("Xnetbeans", "a") as myfile:
-                    myfile.write('send: ' + response)
+                    myfile.write(f'send: {response}')
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
 
 def writePortInFile(port):
-    # Write the port number in Xportnr, so that the test knows it.
-    f = open("Xportnr", "w")
-    f.write("{0}".format(port))
-    f.close()
+    with open("Xportnr", "w") as f:
+        f.write("{0}".format(port))
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 0

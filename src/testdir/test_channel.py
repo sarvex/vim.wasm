@@ -99,10 +99,10 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
                         # send back the argument
                         response = decoded[1][5:]
                     elif decoded[1] == 'make change':
-                        # Send two ex commands at the same time, before
-                        # replying to the request.
-                        cmd = '["ex","call append(\\"$\\",\\"added1\\")"]'
-                        cmd += '["ex","call append(\\"$\\",\\"added2\\")"]'
+                        cmd = (
+                            '["ex","call append(\\"$\\",\\"added1\\")"]'
+                            + '["ex","call append(\\"$\\",\\"added2\\")"]'
+                        )
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
                         response = "ok"
@@ -222,18 +222,15 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
                         print("sending: {0}".format(encoded))
                         self.request.sendall(encoded.encode('utf-8'))
 
-                # Negative numbers are used for "eval" responses.
-                elif decoded[0] < 0:
+                else:
                     last_eval = decoded
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
 
 def writePortInFile(port):
-    # Write the port number in Xportnr, so that the test knows it.
-    f = open("Xportnr", "w")
-    f.write("{0}".format(port))
-    f.close()
+    with open("Xportnr", "w") as f:
+        f.write("{0}".format(port))
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 0
